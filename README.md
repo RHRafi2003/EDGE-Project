@@ -1,6 +1,6 @@
 # 🔴 Red Team Lab Setup & Metasploitable Full Assessment
 
-> **BugsBD Limited — Internship Final Project | May 2026**  
+> ** May 2026**  
 > *A complete, documented penetration testing engagement against Metasploitable 2 in an isolated VMware lab environment.*
 
 ---
@@ -11,8 +11,6 @@
 |-------|---------|
 | **Name** | Md. Redowanul Haq |
 | **Role** | Junior Penetration Tester (Intern) |
-| **Organisation** | BugsBD Limited |
-| **Platform** | Claude.ai / BugsBD Internship Programme 2025 |
 
 ---
 
@@ -210,7 +208,7 @@ msf6 > use auxiliary/scanner/portscan/tcp
 
 ## ⚠️ Disclaimer
 
-> All activities documented in this project were conducted **exclusively in an isolated, locally-hosted virtual lab environment** for **educational purposes** as part of the BugsBD Limited Internship Programme 2025.  
+> All activities documented in this project were conducted **exclusively in an isolated, locally-hosted virtual lab environment** for **educational purposes**.  
 > No external, production, or third-party systems were targeted or affected.  
 > This project complies with ethical hacking principles and responsible disclosure standards.
 
@@ -225,4 +223,4 @@ msf6 > use auxiliary/scanner/portscan/tcp
 
 ---
 
-*© 2026 Md. Redowanul Haq — BugsBD Limited Internship Programme*
+*© 2026 Md. Redowanul Haq Rafi*
