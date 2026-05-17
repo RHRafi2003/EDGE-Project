@@ -10,7 +10,6 @@
 | Field | Details |
 |-------|---------|
 | **Name** | Md. Redowanul Haq |
-| **Role** | Junior Penetration Tester (Intern) |
 
 ---
 
