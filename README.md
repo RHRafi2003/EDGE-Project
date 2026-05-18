@@ -24,18 +24,51 @@ The Kali is the attacker machine and the **target** is Metasploitable 2 as web s
 ## 🏗️ Lab Architecture
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    VMware Workstation                    │
-│                                                         │
-│  ┌──────────────────┐       ┌──────────────────────┐   │
-│  │   Kali Linux     │       │   Metasploitable 2   │   │
-│  │  (Attacker)      │◄─────►│   (Target)           │   │
-│  │  192.168.50.2    │       │   192.168.50.3 (eth0)│   │
-│  └──────────────────┘       │   10.10.10.5   (eth1)│   │
-│                             └──────────────────────┘   │
-│         VLan1: 192.168.50.0/24 (Host-only, isolated)   │
-│         VLan2: 10.10.10.0/24  (Secondary subnet)       │
-└─────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                    VMware Workstation                        │
+│                                                               │
+│  ┌──────────────────┐        ┌──────────────────────────┐    │
+│  │   Kali Linux     │◄──────►│     Metasploitable 2     │    │
+│  │    (Attacker)    │        │      (Web Server)        │    │
+│  │   192.168.50.2   │        │  192.168.50.3  (eth0)    │    │
+│  └──────────────────┘        │   10.10.10.5  (eth1)     │    │
+│                               └──────────┬───────────────┘    │
+│                                          │                    │
+│                                          │                    │
+│                               ┌──────────▼───────────┐        │
+│                               │    Employee System   │        │
+│                               │      (Internal PC)   │        │
+│                               │      10.10.10.4      │        │
+│                               └──────────────────────┘        │
+│                                                               │
+│  VLAN 1: 192.168.50.0/24  (External / Attacker Network)      │
+│  VLAN 2: 10.10.10.0/24    (Internal Employee Network)         │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### Network Explanation
+
+* **Kali Linux** can only directly access:
+
+  * `192.168.50.3` (Metasploitable eth0)
+
+* **Employee System** can only directly access:
+
+  * `10.10.10.5` (Metasploitable eth1)
+
+* **Metasploitable 2** acts as the bridge/pivot host between both networks.
+
+* This setup is perfect for:
+
+  * Pivoting
+  * Port Forwarding
+  * Internal Network Enumeration
+  * Web Server Exploitation
+  * Lateral Movement Practice
+  * Routing Practice without NAT
+
+
 ```
 
 ---
