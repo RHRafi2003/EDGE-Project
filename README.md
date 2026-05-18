@@ -15,7 +15,7 @@
 
 ## 📋 Project Overview
 
-This project demonstrates a **full red team engagement lifecycle** — from building an isolated virtual lab, through enumeration and exploitation, to post-exploitation, pivoting, and professional reporting.
+This project demonstrates a **full red team engagement lifecycle** — from building an isolated virtual lab, through enumeration and exploitation, to post-exploitation, pivoting, and reporting.
 
 The **target** is Metasploitable 2, an intentionally vulnerable Linux machine used exclusively for educational and assessment purposes in a fully air-gapped VMware environment.
 
