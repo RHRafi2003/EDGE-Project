@@ -296,16 +296,17 @@ john --format=NT Hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 
 ```
 Project/
-├── Lab\_Environment\_Setup/   # VMware setup, network config screenshots
-├── FTP/                     # vsFTPd enumeration \& exploitation
-├── SSH/                     # SSH brute force \& login
+├── Lab_Environment_Setup/   # VMware setup, network config screenshots
+├── FTP/                     # vsFTPd enumeration & exploitation
+├── SSH/                     # SSH brute force & login
 ├── Telnet/                  # Telnet exploitation
-├── SMB/                     # Samba enumeration \& exploitation
-├── HTTP/                    # Apache \& web app exploitation
-├── MySql/                   # MySQL enumeration \& access
+├── SMB/                     # Samba enumeration & exploitation
+├── HTTP/                    # Apache & web app exploitation
+├── MySql/                   # MySQL enumeration & access
 ├── Password Cracking/       # John the Ripper hash cracking
-├── Pivoting/                # Proxychains \& network pivoting
-├── Windows\_Payload+Hfs/     # Windows payload, HFS exploit, post-exploitation
+├── Pivoting/                # Proxychains & network pivoting
+├── Windows_Payload/         # Windows payload, post-exploitation
+├── Windows HFS/             # HFS exploit, post-exploitation
 ├── Sniffing/                # Wireshark packet capture
 └── Sniffing with burp/      # Burp Suite HTTP interception
 ```
